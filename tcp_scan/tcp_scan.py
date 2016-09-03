@@ -2,7 +2,6 @@
 import optparse
 import socket
 
-
 def connScan(tgtHost, tgtPort):
     try:
         connSkt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

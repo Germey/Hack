@@ -24,8 +24,6 @@ def connScan(tgtHost, tgtPort):
         connSkt.close()
 
 
-
-
 def portScan(tgtHost, tgtPorts):
     try:
         tgtIP = socket.gethostbyname(tgtHost)
@@ -42,7 +40,6 @@ def portScan(tgtHost, tgtPorts):
         print('Scanning port ' + str(tgtPort))
         t = threading.Thread(target=connScan, args=(tgtHost, int(tgtPort)))
         t.start()
-
 
 
 def main():
@@ -63,4 +60,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
