@@ -45,15 +45,18 @@ def nmap_scan(ip, port):
     global lock
     try:
         nmap_scanner = PortScanner()
-        result = nmap_scanner.scan(ip, port)
+        result = nmap_scanner.scan(ip, str(port))
         state = result['scan'][ip]['tcp'][int(port)]['state']
         lock.acquire()
         print '[+][', port, '], IP:', ip, 'Port:', port, 'State:', state
         print '[+]', result['scan'][ip]['tcp'][int(port)]
-        open_ports.append(port)
-    except:
+        if state == 'open':
+            open_ports.append(port)
+        else:
+            closed_ports.append(port)
+    except Exception, e:
         lock.acquire()
-        print '[-] IP:', ip, 'Port:', port, 'Errors occur when scanning'
+        print '[-] IP:', ip, 'Port:', port, 'Errors occur when scanning', e.message
         closed_ports.append(port)
     finally:
         lock.release()
@@ -66,12 +69,15 @@ def parse_args():
     parser.add_option('-p', '--ports', dest='ports', type='string', help='specify target ports')
     (options, args) = parser.parse_args()
     des = options.des
-    args.append(options.ports)
-    ports = args
-    print des, args
-    if des == None or ports == None:
-        print('[-] You must specify a target host and port[s]!')
+    if des == None:
+        print('[-] You must specify a destination')
         exit(0)
+    if options.ports == None:
+        ports = range(25)
+    else:
+        args.append(options.ports)
+        ports = args
+    print des, ports
     return des, ports
 
 
