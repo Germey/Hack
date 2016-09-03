@@ -4,11 +4,13 @@ import optparse
 import socket
 import threading
 from nmap import PortScanner
+
 from urlparse import urlparse
 
 lock = threading.Semaphore(value=1)
 open_ports = []
 closed_ports = []
+max_port_number = 80
 
 def valid_ip(address):
     try:
@@ -73,11 +75,10 @@ def parse_args():
         print('[-] You must specify a destination')
         exit(0)
     if options.ports == None:
-        ports = range(25)
+        ports = range(max_port_number + 1)
     else:
         args.append(options.ports)
         ports = args
-    print des, ports
     return des, ports
 
 
@@ -95,6 +96,7 @@ def main():
     print '[+] Scan finished'
     print '[+] Open Ports', open_ports
     print '[+] Closed Ports', closed_ports
+
 
 if __name__ == '__main__':
     main()
