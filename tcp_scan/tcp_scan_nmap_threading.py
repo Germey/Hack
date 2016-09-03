@@ -7,7 +7,8 @@ from nmap import PortScanner
 from urlparse import urlparse
 
 lock = threading.Semaphore(value=1)
-
+open_ports = []
+closed_ports = []
 
 def valid_ip(address):
     try:
@@ -25,7 +26,7 @@ def get_host_name(ip):
     try:
         return socket.gethostbyaddr(ip)
     except socket.herror:
-        print 'Unknown host name'
+        print '[-] Unknown host name'
 
 
 def get_ip(des):
@@ -34,7 +35,7 @@ def get_ip(des):
             ip = socket.gethostbyname(get_host_path(des))
             return ip
         except socket.error:
-            print 'Errors occur when getting ip'
+            print '[-] Errors occur when getting ip'
             exit(0)
     else:
         return des
@@ -47,11 +48,13 @@ def nmap_scan(ip, port):
         result = nmap_scanner.scan(ip, port)
         state = result['scan'][ip]['tcp'][int(port)]['state']
         lock.acquire()
-        print 'IP:', ip, 'Port:', port, 'State:', state
-        print result['scan'][ip]['tcp'][int(port)]
+        print '[+][', port, '], IP:', ip, 'Port:', port, 'State:', state
+        print '[+]', result['scan'][ip]['tcp'][int(port)]
+        open_ports.append(port)
     except:
         lock.acquire()
-        print 'IP:', ip, 'Port:', port, 'Errors occur when scanning'
+        print '[-] IP:', ip, 'Port:', port, 'Errors occur when scanning'
+        closed_ports.append(port)
     finally:
         lock.release()
 
@@ -67,7 +70,7 @@ def parse_args():
     ports = args
     print des, args
     if des == None or ports == None:
-        print('You must specify a target host and port[s]!')
+        print('[-] You must specify a target host and port[s]!')
         exit(0)
     return des, ports
 
@@ -83,7 +86,9 @@ def main():
         t.start()
     for t in threads:
         t.join()
-
+    print '[+] Scan finished'
+    print '[+] Open Ports', open_ports
+    print '[+] Closed Ports', closed_ports
 
 if __name__ == '__main__':
     main()
